@@ -1,0 +1,35 @@
+main:
+  steps:
+    - STEP_1_Tratamento_Datas:
+        call: http.post
+        args:
+          url: https://ssa-api-1086310451131.us-central1.run.app/step1
+
+    - STEP_2_Remocao_Vazios:
+        call: http.post
+        args:
+          url: https://ssa-api-1086310451131.us-central1.run.app/step2
+
+    - STEP_3_Enriquecimento_Generos:
+        call: http.post
+        args:
+          url: https://ssa-api-1086310451131.us-central1.run.app/step3
+
+    - Execucao_Em_Paralelo:
+        parallel:
+          branches:
+            - Ramo_STEP_4_Media_Avaliacao:
+                steps:
+                  - call_step4:
+                      call: http.post
+                      args:
+                        url: https://ssa-api-1086310451131.us-central1.run.app/step4
+            - Ramo_STEP_5_Total_Artista:
+                steps:
+                  - call_step5:
+                      call: http.post
+                      args:
+                        url: https://ssa-api-1086310451131.us-central1.run.app/step5
+
+    - Finalizacao_Sucesso:
+        return: "Pipeline AV-03 executado com sucesso e tabelas atualizadas no BigQuery!"
